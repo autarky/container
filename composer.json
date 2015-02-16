@@ -12,7 +12,8 @@
 	"require": {
 	},
 	"require-dev": {
-		"mockery/mockery": "~0.9.1"
+		"mockery/mockery": "~0.9.1",
+		"autarky/framework": "~0.8"
 	},
 	"autoload": {
 		"psr-4": {
