@@ -1,0 +1,24 @@
+{
+	"name": "autarky/container",
+	"description": "Service and dependency injection container.",
+	"keywords": ["autarky", "container", "dependency injection"],
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Andreas Lutro",
+			"email": "anlutro@gmail.com"
+		}
+	],
+	"require": {
+	},
+	"require-dev": {
+		"mockery/mockery": "~0.9.1"
+	},
+	"autoload": {
+		"psr-4": {
+			"Autarky\\Container\\": "src/"
+		}
+	},
+	"minimum-stability": "dev",
+	"prefer-stable": true
+}
