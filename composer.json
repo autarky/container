@@ -22,7 +22,7 @@
 	},
 	"autoload-dev": {
 		"classmap": [
-			"tests/classes"
+			"tests/stubs.php"
 		]
 	},
 	"minimum-stability": "dev",

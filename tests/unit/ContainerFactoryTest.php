@@ -1,16 +1,9 @@
 <?php
 
-use Mockery as m;
-use Autarky\Container\ContainerInterface;
 use Autarky\Container\Container;
 
 class ContainerFactoryTest extends PHPUnit_Framework_TestCase
 {
-	protected function tearDown()
-	{
-		m::close();
-	}
-
 	protected function makeContainer()
 	{
 		return new Container;
