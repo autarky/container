@@ -105,6 +105,7 @@ class Container implements ContainerInterface
 	{
 		$this->instance('Autarky\Container\Container', $this);
 		$this->alias('Autarky\Container\Container', 'Autarky\Container\ContainerInterface');
+		$this->alias('Autarky\Container\Container', 'Autarky\Container\ClassResolverInterface');
 	}
 
 	/**

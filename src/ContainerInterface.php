@@ -20,7 +20,7 @@ namespace Autarky\Container;
  * @link http://en.wikipedia.org/wiki/Inversion_of_control
  * @link http://martinfowler.com/articles/injection.html
  */
-interface ContainerInterface
+interface ContainerInterface extends ClassResolverInterface
 {
 	/**
 	 * Define a factory for a given class.
