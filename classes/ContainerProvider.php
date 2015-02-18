@@ -26,7 +26,5 @@ class ContainerProvider extends Provider
 	{
 		$this->app->setContainer($dic = new Container);
 		$dic->instance('Autarky\Application', $this->app);
-		$dic->instance('Autarky\Container\Container', $dic);
-		$dic->alias('Autarky\Container\Container', 'Autarky\Container\ContainerInterface');
 	}
 }
