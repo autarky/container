@@ -17,8 +17,13 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"Autarky\\Container\\": "src/"
+			"Autarky\\Container\\": "classes/"
 		}
+	},
+	"autoload-dev": {
+		"classmap": [
+			"tests/classes"
+		]
 	},
 	"minimum-stability": "dev",
 	"prefer-stable": true
