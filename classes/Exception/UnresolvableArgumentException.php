@@ -10,6 +10,7 @@
 
 namespace Autarky\Container\Exception;
 
+use Exception;
 use ReflectionFunctionAbstract;
 use ReflectionMethod;
 use ReflectionParameter;
@@ -21,11 +22,32 @@ use ReflectionParameter;
 class UnresolvableArgumentException extends ContainerException
 {
 	/**
-	 * {@inheritdoc}
+	 * Create a new exception from some reflection objects.
+	 *
+	 * @param  ReflectionParameter             $param
+	 * @param  ReflectionFunctionAbstract|null $func
+	 * @param  Exception|null                  $previous
+	 * @param  string|null                     $afterMessage
+	 *
+	 * @return static
 	 */
-	public static function fromReflectionParam(ReflectionParameter $param, ReflectionFunctionAbstract $func = null)
-	{
-		return new static(static::makeMessage($param, $func));
+	public static function fromReflectionParam(
+		ReflectionParameter $param,
+		ReflectionFunctionAbstract $func = null,
+		Exception $previous = null,
+		$afterMessage = null
+	) {
+		$message = static::makeMessage($param, $func);
+
+		if ($previous) {
+			$message .= ' - '.$previous->getMessage();
+		}
+
+		if ($afterMessage) {
+			$message .= ' - '.$afterMessage;
+		}
+
+		return new static($message, 0, $previous);
 	}
 
 	protected static function makeMessage(ReflectionParameter $param, ReflectionFunctionAbstract $func = null)

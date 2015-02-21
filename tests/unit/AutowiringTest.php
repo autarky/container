@@ -22,11 +22,21 @@ class AutowiringTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function unresolvableArgumentThrowsException()
+	public function unresolvableScalarArgumentThrowsException()
 	{
 		$c = $this->makeContainer();
-		$this->setExpectedException('Autarky\Container\Exception\UnresolvableArgumentException');
-		$c->resolve('UnresolvableStub');
+		$this->setExpectedException('Autarky\Container\Exception\UnresolvableArgumentException',
+			'Unresolvable argument: Argument #1 ($value) of UnresolvableScalarStub::__construct - Argument is required and has no value');
+		$c->resolve('UnresolvableScalarStub');
+	}
+
+	/** @test */
+	public function unresolvableClassArgumentThrowsException()
+	{
+		$c = $this->makeContainer();
+		$this->setExpectedException('Autarky\Container\Exception\UnresolvableArgumentException',
+			'Unresolvable argument: Argument #1 ($value) of UnresolvableClassStub::__construct - Class ThisClassDoesNotExist does not exist');
+		$c->resolve('UnresolvableClassStub');
 	}
 
 	/** @test */

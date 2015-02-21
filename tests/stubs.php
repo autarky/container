@@ -25,8 +25,11 @@ class ContainerAware implements \Autarky\Container\ContainerAwareInterface
 		return $this->container;
 	}
 }
-class UnresolvableStub {
+class UnresolvableScalarStub {
 	public function __construct($value) {}
+}
+class UnresolvableClassStub {
+	public function __construct(ThisClassDoesNotExist $value) {}
 }
 class DefaultValueStub {
 	public $value;

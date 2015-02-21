@@ -132,6 +132,11 @@ class Factory implements FactoryInterface
 			return $arg->getDefault();
 		}
 
-		throw new UnresolvableArgumentException("Argument $name is required and has no value");
+		$pos = $arg->getPosition() + 1;
+		$defName = $this->definition->getName();
+		$message = "Unresolvable argument: Argument #{$pos} ($name) of $defName"
+			.' - Argument is required and has no value';
+
+		throw new UnresolvableArgumentException($message);
 	}
 }

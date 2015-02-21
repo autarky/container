@@ -12,8 +12,10 @@ namespace Autarky\Container\Factory;
 
 use Autarky\Container\ContainerInterface;
 use Autarky\Container\Exception\NotInstantiableException;
+use Autarky\Container\Exception\UnresolvableArgumentException;
 use Closure;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionFunction;
 use ReflectionFunctionAbstract;
 use ReflectionMethod;
@@ -29,6 +31,13 @@ class Definition implements FactoryInterface
 	 * @var callable
 	 */
 	protected $callable;
+
+	/**
+	 * The name of the definition.
+	 *
+	 * @var string|null
+	 */
+	protected $name;
 
 	/**
 	 * Map of argument position => argument
@@ -63,9 +72,10 @@ class Definition implements FactoryInterface
 	 *
 	 * @param callable $callable
 	 */
-	public function __construct($callable)
+	public function __construct($callable, $name = null)
 	{
 		$this->callable = $callable;
+		$this->name = $name;
 	}
 
 	/**
@@ -84,7 +94,7 @@ class Definition implements FactoryInterface
 			throw new NotInstantiableException("Class $class is not instantiable");
 		}
 
-		$factory = new static([$reflectionClass, 'newInstance']);
+		$factory = new static([$reflectionClass, 'newInstance'], "$class::__construct");
 
 		if ($reflectionClass->hasMethod('__construct')) {
 			static::addReflectionArguments($factory, $reflectionClass->getMethod('__construct'));
@@ -104,7 +114,7 @@ class Definition implements FactoryInterface
 	public static function getDefaultForCallable($callable, array $params = array())
 	{
 		if ($callable instanceof Closure) {
-			$factory = new static($callable);
+			$factory = new static($callable, 'closure');
 			$factory->addOptionalClassArgument('$container', 'Autarky\Container\ContainerInterface');
 			return $factory->getFactory($params);
 		}
@@ -149,14 +159,30 @@ class Definition implements FactoryInterface
 		}
 
 		foreach ($reflectionFunction->getParameters() as $arg) {
-			$name = $arg->getName();
-			$required = ! $arg->isOptional();
-			if ($argClass = $arg->getClass()) {
-				$factory->addClassArgument($name, $argClass->getName(), $required);
-			} else {
-				$factory->addScalarArgument($name, null, $required, ($required ? null : $arg->getDefaultValue()));
+			try {
+				$name = $arg->getName();
+				$required = ! $arg->isOptional();
+				if ($argClass = $arg->getClass()) {
+					$factory->addClassArgument($name, $argClass->getName(), $required);
+				} else {
+					$default = ($required ? null : $arg->getDefaultValue());
+					$factory->addScalarArgument($name, null, $required, $default);
+				}
+			} catch (ReflectionException $re) {
+				throw UnresolvableArgumentException::fromReflectionParam(
+					$arg, $reflectionFunction, $re);
 			}
 		}
+	}
+
+	/**
+	 * Get the factory's name.
+	 *
+	 * @return string|null
+	 */
+	public function getName()
+	{
+		return $this->name;
 	}
 
 	/**
