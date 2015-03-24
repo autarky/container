@@ -20,7 +20,7 @@ namespace Autarky\Container;
  * @link http://en.wikipedia.org/wiki/Inversion_of_control
  * @link http://martinfowler.com/articles/injection.html
  */
-interface ContainerInterface extends ClassResolverInterface
+interface ContainerInterface extends ClassResolverInterface, CallableInvokerInterface
 {
 	/**
 	 * Define a factory for a given class.
@@ -128,23 +128,6 @@ interface ContainerInterface extends ClassResolverInterface
 	 * @return mixed
 	 */
 	public function resolve($class, array $params = array());
-
-	/**
-	 * Execute a function, closure or class method, resolving type-hinted
-	 * arguments as necessary.
-	 *
-	 * Callable can be anything that passes is_callable() in PHP, including an
-	 * array of ['ClassName', 'method'], in which case the class will first be
-	 * resolved from the container. Callable can also be some things that don't
-	 * pass is_callable(), for example ['InterfaceName', 'method'], but only if
-	 * 'InterfaceName' is bound to the container somehow.
-	 *
-	 * @param  callable $callable
-	 * @param  array    $params   See ContainerInterface::params()
-	 *
-	 * @return mixed
-	 */
-	public function invoke($callable, array $params = array());
 
 	/**
 	 * Register a callback for whenever the given class is resolved.

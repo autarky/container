@@ -10,6 +10,15 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
+	public function implementsInterfaces()
+	{
+		$c = $this->makeContainer();
+		$this->assertInstanceOf('Autarky\Container\ClassResolverInterface', $c);
+		$this->assertInstanceOf('Autarky\Container\CallableInvokerInterface', $c);
+		$this->assertInstanceOf('Autarky\Container\ContainerInterface', $c);
+	}
+
+	/** @test */
 	public function setContainerIsCalledOnContainerAwareInterfaceClasses()
 	{
 		$c = $this->makeContainer();
