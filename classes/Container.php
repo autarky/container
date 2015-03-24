@@ -106,6 +106,7 @@ class Container implements ContainerInterface
 		$this->instance('Autarky\Container\Container', $this);
 		$this->alias('Autarky\Container\Container', 'Autarky\Container\ContainerInterface');
 		$this->alias('Autarky\Container\Container', 'Autarky\Container\ClassResolverInterface');
+		$this->alias('Autarky\Container\Container', 'Autarky\Container\CallableInvokerInterface');
 	}
 
 	/**
@@ -129,10 +130,13 @@ class Container implements ContainerInterface
 	 */
 	public function invoke($callable, array $params = array())
 	{
+		// if $callable is a string, assume it's a class name with the method
+		// "invoke" defined
 		if (is_string($callable) && !is_callable($callable)) {
 			$callable = [$callable, 'invoke'];
 		}
 
+		// if $callable is a static method-like string, convert it to an array
 		if (is_string($callable) && strpos($callable, '::') !== false) {
 			$callable = explode('::', $callable);
 		}
@@ -163,7 +167,7 @@ class Container implements ContainerInterface
 			throw new \InvalidArgumentException("Callable must be a callable or array, $type given");
 		}
 
-		if ($class && array_key_exists($class, $this->params)) {
+		if ($class && isset($this->params[$class])) {
 			$params = array_replace($this->params[$class], $params);
 		}
 
@@ -183,36 +187,42 @@ class Container implements ContainerInterface
 	{
 		$alias = null;
 
-		if (array_key_exists($class, $this->aliases)) {
+		if (isset($this->aliases[$class])) {
 			$alias = $class;
 			$class = $this->aliases[$class];
 		}
 
+		// will throw an exception if the class or alias is protected
 		$this->checkProtected($class, $alias);
 
-		if (array_key_exists($class, $this->instances)) {
+		// if the class is shared, an instance may already exist
+		if (isset($this->instances[$class])) {
 			return $this->instances[$class];
 		}
 
-		if (array_key_exists($class, $this->params)) {
+		if (isset($this->params[$class])) {
 			$params = array_replace($this->params[$class], $params);
 		}
 
+		// internal classes don't need to be protected when resolving
+		// dependencies. save the previous protectInternals value, it will be
+		// reset after resolving dependencies
 		$previousState = $this->protectInternals;
 		$this->protectInternals = false;
 
+		// if no factory is defined for the class, create one
 		if (!isset($this->factories[$class]) && $this->autowire) {
 			$this->factories[$class] = Definition::getDefaultForClass($class);
 		}
 
-		if (array_key_exists($class, $this->factories)) {
-			$object = $this->callFactory($this->factories[$class], $params);
-		} else {
+		if (!isset($this->factories[$class])) {
 			if ($alias) {
 				$class = "$class (via $alias)";
 			}
 			throw new Exception\ResolvingException("No factory defined for $class");
 		}
+
+		$object = $this->callFactory($this->factories[$class], $params);
 
 		$this->protectInternals = $previousState;
 
@@ -279,6 +289,8 @@ class Container implements ContainerInterface
 
 		$factory = $this->factories[$class];
 
+		// if $params is defined, we need to either make a copy of the existing
+		// Factory or make the Definition create a new factory with the params
 		if ($params) {
 			$factory = $factory->getFactory($params);
 		}
@@ -374,7 +386,7 @@ class Container implements ContainerInterface
 		if ($params && array_key_exists($name, $params)) {
 			$argument = $params[$name];
 
-			if (is_array($argument) && array_key_exists($argument[0], $this->factories)) {
+			if (is_array($argument) && isset($this->factories[$argument[0]])) {
 				$argument = $this->callFactory($argument[0], $argument[1]);
 			}
 
@@ -420,7 +432,7 @@ class Container implements ContainerInterface
 			call_user_func($callback, $object, $this);
 		}
 
-		if (array_key_exists($key, $this->resolvingCallbacks)) {
+		if (isset($this->resolvingCallbacks[$key])) {
 			foreach ($this->resolvingCallbacks[$key] as $callback) {
 				call_user_func($callback, $object, $this);
 			}
@@ -442,13 +454,13 @@ class Container implements ContainerInterface
 	 */
 	public function isBound($class)
 	{
-		if (array_key_exists($class, $this->aliases)) {
+		if (isset($this->aliases[$class])) {
 			$class = $this->aliases[$class];
 		}
 
-		return array_key_exists($class, $this->instances)
-			|| array_key_exists($class, $this->factories)
-			|| array_key_exists($class, $this->shared);
+		return isset($this->instances[$class])
+			|| isset($this->factories[$class])
+			|| isset($this->shared[$class]);
 	}
 
 	/**
@@ -496,7 +508,7 @@ class Container implements ContainerInterface
 	public function params($classOrClasses, array $params)
 	{
 		foreach ((array) $classOrClasses as $class) {
-			if (!array_key_exists($class, $this->params)) {
+			if (!isset($this->params[$class])) {
 				$this->params[$class] = $params;
 			} else {
 				$this->params[$class] = array_replace($this->params[$class], $params);
@@ -513,7 +525,7 @@ class Container implements ContainerInterface
 	 */
 	protected function isShared($class)
 	{
-		return array_key_exists($class, $this->shared) && $this->shared[$class];
+		return isset($this->shared[$class]) && $this->shared[$class];
 	}
 
 	/**
@@ -551,6 +563,6 @@ class Container implements ContainerInterface
 	 */
 	protected function isProtected($class)
 	{
-		return array_key_exists($class, $this->internals) && $this->internals[$class];
+		return isset($this->internals[$class]) && $this->internals[$class];
 	}
 }
