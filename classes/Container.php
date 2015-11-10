@@ -160,6 +160,11 @@ class Container implements ContainerInterface
 			if ($reflFunc->isStatic()) {
 				$object = null;
 			}
+
+			$callableString = $class.'::'.$method;
+			if (isset($this->params[$callableString])) {
+				$params = array_replace($this->params[$callableString], $params);
+			}
 		} else if (is_callable($callable)) {
 			$reflFunc = new ReflectionFunction($callable);
 		} else {
@@ -501,13 +506,17 @@ class Container implements ContainerInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function params($classOrClasses, array $params)
+	public function params($keys, array $params)
 	{
-		foreach ((array) $classOrClasses as $class) {
-			if (!isset($this->params[$class])) {
-				$this->params[$class] = $params;
+		foreach ((array) $keys as $key) {
+			if (is_array($key)) {
+				$key = $key[0].'::'.$key[1];
+			}
+
+			if (!isset($this->params[$key])) {
+				$this->params[$key] = $params;
 			} else {
-				$this->params[$class] = array_replace($this->params[$class], $params);
+				$this->params[$key] = array_replace($this->params[$key], $params);
 			}
 		}
 	}

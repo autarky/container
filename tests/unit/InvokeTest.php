@@ -95,4 +95,22 @@ class InvokeTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('default', $c->invoke(['ParamConflictStub', 'doStuff']));
 		$this->assertEquals('bar', $c->invoke(['ParamConflictStub', 'doStuff'], ['$value' => 'bar']));
 	}
+
+	/** @test */
+	public function invokeWithParams()
+	{
+		$c = $this->makeContainer();
+		$c->params('StubFactory::makeFoo', ['$suffix' => 'bar']);
+		$retval = $c->invoke(['StubFactory', 'makeFoo']);
+		$this->assertEquals('foobar', $retval);
+		$retval = $c->invoke([new StubFactory, 'makeFoo']);
+		$this->assertEquals('foobar', $retval);
+
+		$c = $this->makeContainer();
+		$c->params([['StubFactory', 'makeFoo']], ['$suffix' => 'bar']);
+		$retval = $c->invoke(['StubFactory', 'makeFoo']);
+		$this->assertEquals('foobar', $retval);
+		$retval = $c->invoke([new StubFactory, 'makeFoo']);
+		$this->assertEquals('foobar', $retval);
+	}
 }
