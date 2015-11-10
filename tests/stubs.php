@@ -57,3 +57,11 @@ class ParamStub {
 		$this->bar = $bar;
 	}
 }
+class ParamConflictStub {
+	public function __construct($value) {
+		$this->value = $value;
+	}
+	public function doStuff($value = 'default') {
+		return $value;
+	}
+}

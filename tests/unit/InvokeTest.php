@@ -26,15 +26,6 @@ class InvokeTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function invokeWithObjectLooksUpClassParams()
-	{
-		$c = $this->makeContainer();
-		$c->params('StubFactory', ['$suffix' => 'bar']);
-		$retval = $c->invoke([new StubFactory, 'makeFoo']);
-		$this->assertEquals('foobar', $retval);
-	}
-
-	/** @test */
 	public function invokeThrowsExceptionOnUnresolvableArgument()
 	{
 		$this->setExpectedException('Autarky\Container\Exception\UnresolvableArgumentException',
@@ -94,5 +85,14 @@ class InvokeTest extends PHPUnit_Framework_TestCase
 		$callback = function(LowerClass $lc) { return $lc; };
 		$retval = $c->invoke($callback, ['$lc' => $lc]);
 		$this->assertSame($lc, $retval);
+	}
+
+	/** @test */
+	public function invokeDoesNotGetParamsForClassConstructor()
+	{
+		$c = $this->makeContainer();
+		$c->params('ParamConflictStub', ['$value' => 'foo']);
+		$this->assertEquals('default', $c->invoke(['ParamConflictStub', 'doStuff']));
+		$this->assertEquals('bar', $c->invoke(['ParamConflictStub', 'doStuff'], ['$value' => 'bar']));
 	}
 }

@@ -167,10 +167,6 @@ class Container implements ContainerInterface
 			throw new \InvalidArgumentException("Callable must be a callable or array, $type given");
 		}
 
-		if ($class && isset($this->params[$class])) {
-			$params = array_replace($this->params[$class], $params);
-		}
-
 		$args = $this->getFunctionArguments($reflFunc, $params);
 
 		if ($class) {
