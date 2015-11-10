@@ -89,4 +89,12 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 		$this->assertSame($c, $c->resolve('Autarky\Container\Container'));
 		$this->assertSame($c, $c->resolve('Autarky\Container\ContainerInterface'));
 	}
+
+	/** @test */
+	public function canPassClassNamesToNonTypeHintedArgs()
+	{
+		$c = $this->makeContainer();
+		$o = $c->resolve('ValueLowerClass', ['$value' => 'LowerClass']);
+		$this->assertInstanceOf('LowerClass', $o->value);
+	}
 }
