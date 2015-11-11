@@ -288,4 +288,17 @@ class Definition implements FactoryInterface
 		return $this->getFactory($params)
 			->invoke($container);
 	}
+
+	/**
+	 * Proxy for the invoke method. Makes the factory definition class callable.
+	 *
+	 * @param  ContainerInterface $container
+	 * @param  array              $params
+	 *
+	 * @return mixed
+	 */
+	public function __invoke(ContainerInterface $container, array $params = array())
+	{
+		return $this->invoke($container, $params);
+	}
 }
