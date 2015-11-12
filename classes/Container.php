@@ -350,7 +350,7 @@ class Container implements ContainerInterface
 			}
 
 			if ($class instanceof Factory\FactoryInterface) {
-				return $class->invoke();
+				return $class->invoke($this);
 			}
 
 			if (is_object($class)) {
