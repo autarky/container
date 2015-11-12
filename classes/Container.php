@@ -246,7 +246,7 @@ class Container implements ContainerInterface
 	/**
 	 * Call a factory.
 	 *
-	 * @param  mixed  $factory
+	 * @param  Factory\FactoryInterface  $factory
 	 * @param  array  $params
 	 *
 	 * @return object
