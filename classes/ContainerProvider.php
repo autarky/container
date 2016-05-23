@@ -10,14 +10,14 @@
 
 namespace Autarky\Container;
 
-use Autarky\Provider;
+use Autarky\Providers\AbstractProvider;
 
 /**
  * Provides the application with a container.
  *
  * This service provider is vital to the framework.
  */
-class ContainerProvider extends Provider
+class ContainerProvider extends AbstractProvider
 {
 	/**
 	 * {@inheritdoc}
