@@ -152,7 +152,7 @@ class Container implements ContainerInterface
 				$object = $class;
 				$class = get_class($object);
 			} else {
-				$object = $this->resolve($class);
+				$object = $this->resolve($class, $params);
 			}
 
 			$reflFunc = new ReflectionMethod($object, $method);
